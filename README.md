@@ -40,7 +40,7 @@ https://go-library-production.up.railway.app
 
 # API cURL Examples
 
-### 1. Create User
+### Create User
 ```
 curl -X POST https://go-library-production.up.railway.app/user/add ^
   -H "Content-Type: application/json" ^
