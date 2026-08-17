@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/piipiets/go-library/model/response"
 )
 
 const jwtSecret = "secret-key"
@@ -16,9 +17,7 @@ func JWTAuth() gin.HandlerFunc {
 		authHeader := c.GetHeader("Authorization")
 
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "authorization header required",
-			})
+			c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "authorization header required"))
 			c.Abort()
 			return
 		}
@@ -26,9 +25,7 @@ func JWTAuth() gin.HandlerFunc {
 		parts := strings.SplitN(authHeader, " ", 2)
 
 		if len(parts) != 2 || parts[0] != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "invalid authorization header",
-			})
+			c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "invalid authorization header"))
 			c.Abort()
 			return
 		}
@@ -49,27 +46,21 @@ func JWTAuth() gin.HandlerFunc {
 		)
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "invalid or expired token",
-			})
+			c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "invalid or expired token"))
 			c.Abort()
 			return
 		}
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "invalid token claims",
-			})
+			c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "invalid token claims"))
 			c.Abort()
 			return
 		}
 
 		username, ok := claims["username"].(string)
 		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "username not found in token",
-			})
+			c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "username not found in token"))
 			c.Abort()
 			return
 		}

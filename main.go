@@ -18,18 +18,22 @@ func main() {
 	connection.Initiator()
 	defer connection.DBConnections.Close()
 
-	migration.Initiator(connection.DBConnections)
+	conn := connection.DBConnections
+	migration.Initiator(conn)
 
 	// repository
-	userRepository := repository.NewUserRepository(connection.DBConnections)
-	categoryRespository := repository.NewCategoryRepository(connection.DBConnections)
+	userRepository := repository.NewUserRepository(conn)
+	categoryRespository := repository.NewCategoryRepository(conn)
 
 	// service
 	authService := service.NewAuthService(userRepository)
 	categoryService := service.NewCategoryService(categoryRespository)
+	userService := service.NewUserService(userRepository)
+
 	// handler
 	authHandler := handler.NewAuthHandler(authService)
-	categoryHandler := handler.NewCategoryHancder(categoryService)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+	userHandler := handler.NewUserHandler(userService)
 
 	// router
 	router := gin.Default()
@@ -39,6 +43,7 @@ func main() {
 		router,
 		authHandler,
 		categoryHandler,
+		userHandler,
 	)
 
 	router.Run(":8080")

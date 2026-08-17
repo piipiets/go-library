@@ -10,13 +10,16 @@ func SetupRoutes(
 	router *gin.Engine,
 	authHandler *handler.AuthHandler,
 	categoryHandler *handler.CategoryHandler,
+	userHandler *handler.UserHandler,
 ) {
 	router.POST("/login", authHandler.Login)
+	router.POST("/user/add", userHandler.CreateUser)
 
 	// Protected routes
 	protected := router.Group("/api")
 	protected.Use(middleware.JWTAuth())
 
 	protected.POST("/categories", categoryHandler.CreateCategory)
-
+	protected.GET("/categories", categoryHandler.GetAllCategory)
+	protected.GET("/categories/:id", categoryHandler.GetCategoryById)
 }

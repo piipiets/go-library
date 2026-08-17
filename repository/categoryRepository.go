@@ -63,11 +63,7 @@ func (r *CategoryRepository) GetAllCategory() ([]model.Categories, error) {
 	query := `
         SELECT
             id,
-			name,
-            created_at,
-            created_by,
-            modified_at,
-            modified_by
+			name
 		FROM categories
         ORDER BY id
     `
@@ -84,10 +80,6 @@ func (r *CategoryRepository) GetAllCategory() ([]model.Categories, error) {
 		err := rows.Scan(
 			&category.ID,
 			&category.Name,
-			&category.CreatedAt,
-			&category.CreatedBy,
-			&category.ModifiedAt,
-			&category.ModifiedBy,
 		)
 
 		if err != nil {
@@ -102,4 +94,28 @@ func (r *CategoryRepository) GetAllCategory() ([]model.Categories, error) {
 	}
 
 	return categories, nil
+}
+
+func (r *CategoryRepository) GetCategoryById(id int) (model.Categories, error) {
+	var category model.Categories
+
+	query := `
+		SELECT id, name
+		FROM categories
+		WHERE id = $1
+	`
+
+	err := r.db.QueryRow(
+		query,
+		id,
+	).Scan(
+		&category.ID,
+		&category.Name,
+	)
+
+	if err != nil {
+		return category, err
+	}
+
+	return category, nil
 }

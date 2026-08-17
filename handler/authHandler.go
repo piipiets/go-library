@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/piipiets/go-library/model/request"
+	"github.com/piipiets/go-library/model/response"
 	"github.com/piipiets/go-library/service"
 )
 
@@ -22,9 +23,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var request request.LoginRequest
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid request",
-		})
+		c.JSON(http.StatusBadRequest, response.Error("Invalid request body", err.Error()))
 		return
 	}
 
@@ -34,13 +33,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	)
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusUnauthorized, response.Error("Login failed", err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-	})
+	c.JSON(http.StatusOK, response.Success("Login success", response.LoginResponse{
+		Token: token,
+	}))
 }

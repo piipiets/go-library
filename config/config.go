@@ -7,11 +7,37 @@ import (
 )
 
 func Initiator() {
+
+	// =========================
+	// 1. System environment
+	// =========================
 	viper.AutomaticEnv()
 
 	viper.BindEnv("DATABASE_URL")
 	viper.BindEnv("DB_ENGINE")
 
+	// =========================
+	// 2. Try read .env
+	// =========================
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+	viper.AddConfigPath(".")
+
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			fmt.Println(".env not found, using system environment")
+		} else {
+			panic(err)
+		}
+	} else {
+		fmt.Println("Using .env:", viper.ConfigFileUsed())
+	}
+
+	// =========================
+	// 3. Validate
+	// =========================
 	requiredEnv := []string{
 		"DATABASE_URL",
 		"DB_ENGINE",
@@ -19,9 +45,12 @@ func Initiator() {
 
 	for _, env := range requiredEnv {
 		if viper.GetString(env) == "" {
-			panic(fmt.Sprintf("%s environment variable is required", env))
+			panic(fmt.Sprintf(
+				"%s environment variable is required",
+				env,
+			))
 		}
 	}
 
-	fmt.Println("Successfully read environment config")
+	fmt.Println("Successfully loaded configuration")
 }
