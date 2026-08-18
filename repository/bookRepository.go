@@ -19,7 +19,7 @@ func NewBookRepository(db *sql.DB) *BookRepository {
 func (r *BookRepository) CreateBook(book model.Book, username string) error {
 
 	query := `
-        INSERT INTO book (
+        INSERT INTO books (
             title,
 			category_id,
 			description,
