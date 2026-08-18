@@ -38,38 +38,38 @@ https://go-library-production.up.railway.app
 
 ---
 
-# API cURL Examples
+## API Endpoints
 
-### Create User
-```
-curl -X POST https://go-library-production.up.railway.app/user/add ^
-  -H "Content-Type: application/json" ^
-  -d "{\"username\":\"pipit\",\"password\":\"123456\"}"
-```
+### Authentication & User
 
-### Login
-``` 
-curl -X POST https://go-library-production.up.railway.app/login ^
-  -H "Content-Type: application/json" ^
-  -d "{\"username\":\"pipit\",\"password\":\"123456\"}"
-  ```
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/login` | ❌ | Login and get JWT token |
+| `POST` | `/user/add` | ❌ | Create a new user |
 
-### Create Category
-```
-curl -X POST https://go-library-production.up.railway.app/api/categories ^
-  -H "Content-Type: application/json" ^
-  -H "Authorization: Bearer <JWT_TOKEN>" ^
-  -d "{\"name\":\"Programming\"}"
-```
+### Categories
 
-### Get All Categories
-```
-curl -X GET https://go-library-production.up.railway.app/api/categories ^
-  -H "Authorization: Bearer <JWT_TOKEN>"
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/categories` | ✅ | Create a category |
+| `GET` | `/api/categories` | ✅ | Get all categories |
+| `GET` | `/api/categories/:id` | ✅ | Get category by ID |
+| `PUT` | `/api/categories/:id` | ✅ | Update category |
+| `DELETE` | `/api/categories/:id` | ✅ | Delete category |
+| `GET` | `/api/categories/:id/books` | ✅ | Get all books by category |
+
+## Example Authorization Header
+
+```http
+Authorization: Bearer <JWT_TOKEN>
 ```
 
-### Get Category By ID
+## Environment Variables
+
+Set these environment variables before running the app:
+
+```env
+DATABASE_URL=postgresql://postgres:password@host:5432/railway
+DB_ENGINE=postgres
 ```
-curl -X GET https://go-library-production.up.railway.app/api/categories/1 ^
-  -H "Authorization: Bearer <JWT_TOKEN>"
-```
+
