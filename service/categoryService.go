@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/piipiets/go-library/model"
 	"github.com/piipiets/go-library/model/request"
@@ -24,10 +25,7 @@ func NewCategoryService(
 	}
 }
 
-func (s *CategoryService) CreateCategory(
-	categoryRequest request.CategoryRequest,
-	username string,
-) (response.CategoryResponse, error) {
+func (s *CategoryService) CreateCategory(categoryRequest request.CategoryRequest, username string) (response.CategoryResponse, error) {
 	category, err := s.repository.Create(categoryRequest, username)
 	if err != nil {
 		return response.CategoryResponse{}, err
@@ -68,4 +66,49 @@ func toCategoryResponse(category model.Categories) response.CategoryResponse {
 		ID:   category.ID,
 		Name: category.Name,
 	}
+}
+
+func (s *CategoryService) DeleteCategory(id int) error {
+	err := s.repository.DeleteCategory(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrCategoryNotFound
+		}
+
+		return err
+	}
+
+	return nil
+}
+
+func (s *CategoryService) GetBooksByCategory(id int) ([]response.BookResponse, error) {
+	books, err := s.repository.GetBooksByCategory(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return books, nil
+}
+
+func (s *CategoryService) UpdateCategory(id int, req request.CategoryRequest, username string) error {
+
+	if req.Name == "" {
+		return errors.New("name should be filled")
+	}
+
+	var category model.Categories
+	category.Name = req.Name
+	category.ModifiedAt = time.Now()
+	category.ModifiedBy = username
+
+	err := s.repository.UpdateCategory(id, category)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrCategoryNotFound
+		}
+
+		return err
+	}
+
+	return nil
 }

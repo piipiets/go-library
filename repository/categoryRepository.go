@@ -6,6 +6,7 @@ import (
 
 	"github.com/piipiets/go-library/model"
 	"github.com/piipiets/go-library/model/request"
+	"github.com/piipiets/go-library/model/response"
 )
 
 type CategoryRepository struct {
@@ -118,4 +119,110 @@ func (r *CategoryRepository) GetCategoryById(id int) (model.Categories, error) {
 	}
 
 	return category, nil
+}
+
+func (r *CategoryRepository) DeleteCategory(id int) error {
+	query := `
+		DELETE
+		FROM categories
+		WHERE id = $1
+	`
+
+	result, err := r.db.Exec(query, id)
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (r *CategoryRepository) GetBooksByCategory(id int) ([]response.BookResponse, error) {
+	var books []response.BookResponse
+
+	query := `
+        SELECT
+            b.title,
+			b.description,
+			b.image_url,
+			b.release_year,
+			b.price,
+			b.total_page,
+			b.thickness,
+			c.name as category
+		FROM books b
+		JOIN categories c ON b.category_id = c.categories.id
+		WHERE category_id = $1
+        ORDER BY b.id
+    `
+
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var book response.BookResponse
+
+		err := rows.Scan(
+			&book.Title,
+			&book.Description,
+			&book.ImageUrl,
+			&book.ReleaseYear,
+			&book.Price,
+			&book.TotalPage,
+			&book.Thickness,
+			&book.Category,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		books = append(books, book)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return books, nil
+}
+
+func (r *CategoryRepository) UpdateCategory(id int, category model.Categories) error {
+	query := `
+		UPDATE categories
+		SET name = $1,
+		    modified_at = $2,
+		    modified_by = $3
+		WHERE id = $4
+		RETURNING id, name
+	`
+
+	result, err := r.db.Exec(
+		query,
+		category.Name,
+		category.ModifiedAt,
+		category.ModifiedBy,
+		id,
+	)
+
+	rowsAffected, err := result.RowsAffected()
+
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
 }

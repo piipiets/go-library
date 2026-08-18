@@ -84,3 +84,83 @@ func (h *CategoryHandler) GetCategoryById(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.Success("Category fetched successfully", category))
 }
+
+func (h *CategoryHandler) DeleteCategory(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response.Error("Invalid category ID", err.Error()))
+		return
+	}
+
+	err2 := h.service.DeleteCategory(id)
+
+	if err2 != nil {
+		if errors.Is(err2, service.ErrCategoryNotFound) {
+			c.JSON(http.StatusNotFound, response.Error("Category Not Found", err2.Error()))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, response.Error("Failed to delete category data", err2.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.Success("Category deleted successfully", nil))
+}
+
+func (h *CategoryHandler) GetBooksByCategory(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, response.Error("Invalid category ID", err.Error()))
+		return
+	}
+
+	books, err := h.service.GetBooksByCategory(id)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, response.Error("Failed to get books data", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.Success("Books fetched successfully", books))
+}
+
+func (h *CategoryHandler) UpdateCategory(c *gin.Context) {
+	id, errParam := strconv.Atoi(c.Param("id"))
+	if errParam != nil {
+		c.JSON(http.StatusBadRequest, response.Error("Invalid category ID", errParam.Error()))
+		return
+	}
+
+	var categoryRequest request.CategoryRequest
+	// Parse JSON
+	if errBody := c.ShouldBindJSON(&categoryRequest); errBody != nil {
+		c.JSON(http.StatusBadRequest, response.Error("Invalid request body", errBody.Error()))
+		return
+	}
+
+	usernameValue, exists := c.Get("username")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "username not found in token"))
+		return
+	}
+
+	username, ok := usernameValue.(string)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, response.Error("Unauthorized", "invalid username in token"))
+		return
+	}
+
+	err := h.service.UpdateCategory(id, categoryRequest, username)
+
+	if err != nil {
+		if errors.Is(err, service.ErrCategoryNotFound) {
+			c.JSON(http.StatusNotFound, response.Error("Category Not Found", err.Error()))
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, response.Error("Failed to update category data", err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.Success("Category updated successfully", nil))
+}
