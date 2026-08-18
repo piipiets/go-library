@@ -157,12 +157,12 @@ func (r *CategoryRepository) GetBooksByCategory(id int) ([]response.BookResponse
 			b.thickness,
 			c.name as category
 		FROM books b
-		JOIN categories c ON b.category_id = c.categories.id
-		WHERE category_id = $1
-        ORDER BY b.id
+		JOIN categories c ON b.category_id = c.id
+		WHERE b.category_id = $1
+		ORDER BY b.id
     `
 
-	rows, err := r.db.Query(query)
+	rows, err := r.db.Query(query, id)
 	if err != nil {
 		return nil, err
 	}
