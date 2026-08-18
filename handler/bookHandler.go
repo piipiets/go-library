@@ -47,5 +47,5 @@ func (h *BookHandler) CreateBook(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, response.Success("Category created successfully", nil))
+	c.JSON(http.StatusCreated, response.Success("Book created successfully", nil))
 }
