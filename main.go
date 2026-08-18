@@ -24,16 +24,19 @@ func main() {
 	// repository
 	userRepository := repository.NewUserRepository(conn)
 	categoryRespository := repository.NewCategoryRepository(conn)
+	bookRepository := repository.NewBookRepository(conn)
 
 	// service
 	authService := service.NewAuthService(userRepository)
 	categoryService := service.NewCategoryService(categoryRespository)
 	userService := service.NewUserService(userRepository)
+	bookService := service.NewBookService(bookRepository)
 
 	// handler
 	authHandler := handler.NewAuthHandler(authService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 	userHandler := handler.NewUserHandler(userService)
+	bookHandler := handler.NewBookHandler(bookService)
 
 	// router
 	router := gin.Default()
@@ -44,6 +47,7 @@ func main() {
 		authHandler,
 		categoryHandler,
 		userHandler,
+		bookHandler,
 	)
 
 	router.Run(":8080")

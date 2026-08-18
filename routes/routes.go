@@ -11,6 +11,7 @@ func SetupRoutes(
 	authHandler *handler.AuthHandler,
 	categoryHandler *handler.CategoryHandler,
 	userHandler *handler.UserHandler,
+	bookHandler *handler.BookHandler,
 ) {
 	router.POST("/login", authHandler.Login)
 	router.POST("/user/add", userHandler.CreateUser)
@@ -25,4 +26,6 @@ func SetupRoutes(
 	protected.DELETE("/categories/:id", categoryHandler.DeleteCategory)
 	protected.GET("/categories/:id/books", categoryHandler.GetBooksByCategory)
 	protected.PUT("/categories/:id", categoryHandler.UpdateCategory)
+
+	protected.POST("/books", bookHandler.CreateBook)
 }
