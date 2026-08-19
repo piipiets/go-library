@@ -58,6 +58,15 @@ https://go-library-production.up.railway.app
 | `DELETE` | `/api/categories/:id` | ✅ | Delete category |
 | `GET` | `/api/categories/:id/books` | ✅ | Get all books by category |
 
+### Books
+| Method   | Endpoint         | Auth | Description    |
+| -------- | ---------------- | ---- | -------------- |
+| `POST`   | `/api/books`     | ✅    | Create a book  |
+| `GET`    | `/api/books`     | ✅    | Get all books  |
+| `GET`    | `/api/books/:id` | ✅    | Get book by ID |
+| `PUT`    | `/api/books/:id` | ✅    | Update a book  |
+| `DELETE` | `/api/books/:id` | ✅    | Delete a book  |
+
 ## Example Authorization Header
 
 ```http

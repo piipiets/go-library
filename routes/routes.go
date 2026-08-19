@@ -28,4 +28,8 @@ func SetupRoutes(
 	protected.PUT("/categories/:id", categoryHandler.UpdateCategory)
 
 	protected.POST("/books", bookHandler.CreateBook)
+	protected.GET("/books", bookHandler.GetAllBooks)
+	protected.GET("/books/:id", bookHandler.GetBookById)
+	protected.PUT("/books/:id", bookHandler.UpdateBook)
+	protected.DELETE("/books/:id", bookHandler.DeleteBook)
 }
