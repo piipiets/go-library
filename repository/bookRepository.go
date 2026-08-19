@@ -187,7 +187,7 @@ func (r *BookRepository) UpdateBook(id int, book model.Book) error {
 		book.Thickness,
 		book.ModifiedAt,
 		book.ModifiedBy,
-		book.ID,
+		id,
 	)
 
 	rowsAffected, err := result.RowsAffected()
